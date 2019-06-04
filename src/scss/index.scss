@@ -1,0 +1,169 @@
+$bgcolor:#060A3D;
+$color1:#fff;
+$color2:#868aaf;
+$color3:#DB3BAA;
+$color3-1: darken($color3,10%);
+$color3-2: darken($color3,30%);
+$color4:#0025F1;
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#huaweiMusic{
+    width: 100vw;
+    height: 100vh;
+    background-color:$bgcolor;
+    display: flow-root;
+    .header{
+        height: 90px;
+        text-align: center;
+        margin-top: 20px;
+        h1{
+            color:$color1;
+            font-size: 20px;
+            margin-bottom: 6px;
+        }
+        p{
+            color: $color2;
+            font-size: 12px;
+        }
+        .cricle{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            div{
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                background-color: $color3-1;
+                margin: 16px 4px;
+                &.smallCricle{
+                    width: 6px;
+                    height: 6px;
+                    background-color: $color3-2;
+                }
+            }
+        }
+    }
+    .mainShow{
+        height: calc(100vh - 270px);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        .ringBox{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            height: 40vh;
+            .outerRing{
+                width: 60vw;
+                height: 60vw;
+                position: absolute;
+                background: url('../svg/effect-move1.svg') no-repeat;
+                background-size: contain;
+                animation: rotateAnimation 7s linear  infinite reverse;
+            }
+            .middleRing{
+                width: 24vw;
+                height: 24vw;
+                position: absolute;
+                background: url('../svg/effect-move2.svg') no-repeat;
+                background-size: contain;
+                animation: rotateAnimation 5s linear  infinite;
+            }
+            .insideRing{
+                width: 70vw;
+                height: 70vw;
+                position: absolute;
+                background: url('../svg/effect-no-move.svg') no-repeat;
+                background-size: contain;
+                animation: rotateAnimation 9s linear  infinite;
+            }
+            @keyframes rotateAnimation {
+                0%{
+                    transform: rotate(0)
+                }
+                100%{
+                    transform: rotate(360deg)
+                }
+            }
+        }
+        .lyricsBox{
+            font-size: 14px;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.6em;
+            .lyricsActive{
+                color: $color1;
+            }
+            .lyrics{
+                color: $color2;
+            }
+        }
+        
+    }
+    .footer{
+        height: 160px;
+        .svgBox{
+            display: flex;
+            justify-content: center;
+            svg{
+                width: 24px;
+                height: 24px;
+                margin: 0 20px;
+            }
+        }
+        .barBox{
+            display: flex;
+            padding: 0 16px;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            span{
+                color: $color2;
+                font-size: 12px;
+            }
+            .bar{
+                flex: 1;
+                height: 4px;
+                border-radius: 2px;
+                background-color:$color4;
+                margin: 0 6px;
+                .progressBar{
+                    height: 4px;
+                    width: 50px;
+                    border-radius: 2px;
+                    background-color: $color3;
+                    position: relative;
+                    &::after{
+                        content: '';
+                        width: 16px;
+                        height: 16px;
+                        background: url('../svg/progress.svg') no-repeat;
+                        background-size: contain;
+                        position: absolute;
+                        right: 0px;
+                        top: -6px;
+                    }
+                }
+            }
+        }
+        .controlButton{
+            display: flex;
+            justify-content: space-between;
+            padding: 0 16px;
+            margin-top: 20px;
+            align-items: center;
+            svg{
+                width: 28px;
+                height: 28px;
+                &.iconplay{
+                    width: 50px;
+                    height: 50px;
+                }
+            }
+        }
+    }
+}
