@@ -130,7 +130,93 @@ xxx.innerHTML = "\n<? xml version = \"1.0\" encoding = \"UTF-8\" ?>\n<svg style=
 
 require("./icon");
 
-console.log('华为');
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var player =
+/*#__PURE__*/
+function () {
+  function player(node) {
+    _classCallCheck(this, player);
+
+    this.root = document.querySelector(node);
+    this.playList = [];
+    this.currentIndex = 0;
+    this.audio = new Audio(); //相当于在html中创建audio标签
+
+    this.start();
+    this.bind();
+  }
+
+  _createClass(player, [{
+    key: "start",
+    value: function start() {
+      var _this = this;
+
+      fetch('https://jirengu.github.io/data-mock/huawei-music/music-list.json').then(function (res) {
+        return res.json();
+      }).then(function (data) {
+        console.log(data);
+        _this.playList = data;
+        _this.audio.src = _this.playList[_this.currentIndex].url;
+      });
+    }
+  }, {
+    key: "bind",
+    value: function bind() {
+      var self = this;
+
+      this.root.querySelector('.iconplay').onclick = function () {
+        if (this.classList.contains('playing')) {
+          self.audio.play();
+          this.classList.remove('playing');
+          this.classList.add('pause');
+          this.querySelector('use').setAttribute('xlink:href', '#icon-pause');
+        } else if (this.classList.contains('pause')) {
+          self.audio.pause();
+          this.classList.remove('pause');
+          this.classList.add('playing');
+          this.querySelector('use').setAttribute('xlink:href', '#icon-play');
+        }
+      };
+
+      this.root.querySelector('.iconnext').onclick = function () {
+        self.nextplay();
+        self.audio.play();
+        self.root.querySelector('.iconplay').classList.remove('playing');
+        self.root.querySelector('.iconplay').classList.add('pause');
+        self.root.querySelector('.iconplay').querySelector('use').setAttribute('xlink:href', '#icon-pause');
+      };
+
+      this.root.querySelector('.iconpre').onclick = function () {
+        self.preplay();
+        self.audio.play();
+        self.root.querySelector('.iconplay').classList.remove('playing');
+        self.root.querySelector('.iconplay').classList.add('pause');
+        self.root.querySelector('.iconplay').querySelector('use').setAttribute('xlink:href', '#icon-pause');
+      };
+    }
+  }, {
+    key: "preplay",
+    value: function preplay() {
+      this.currentIndex = (this.currentIndex + this.playList.length - 1) % 4;
+      this.audio.src = this.playList[this.currentIndex].url;
+    }
+  }, {
+    key: "nextplay",
+    value: function nextplay() {
+      this.currentIndex = (this.currentIndex + this.playList.length + 1) % 4;
+      this.audio.src = this.playList[this.currentIndex].url;
+    }
+  }]);
+
+  return player;
+}();
+
+new player('#huaweiMusic');
 },{"./icon":"src/javascript/icon.js"}],"../../AppData/Roaming/npm/node_modules/parcel-bundler/src/builtins/hmr-runtime.js":[function(require,module,exports) {
 var global = arguments[3];
 var OVERLAY_ID = '__parcel__error__overlay__';
@@ -159,7 +245,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "56487" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "64781" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};
