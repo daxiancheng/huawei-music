@@ -251,6 +251,7 @@ function () {
     this.audio = new Audio(); //相当于在html中创建audio标签
 
     this.lyricArr = [];
+    this.lyricArrIndex = 0;
     this.start();
     this.bind();
   }
@@ -313,6 +314,12 @@ function () {
         this.classList.add('active1');
         console.log('right');
       });
+
+      this.audio.ontimeupdate = function () {
+        console.log(parseInt(self.audio.currentTime * 1000));
+        self.setLocalLyric();
+        self.setProgressBar();
+      };
     }
   }, {
     key: "preplay",
@@ -406,14 +413,39 @@ function () {
         p.setAttribute('data', line[0]);
         fragment.appendChild(p);
       });
+      console.log(this.lyricArr);
       this.root.querySelector('.mainShow2 .contentLyics').innerHTML = '';
       this.root.querySelector('.mainShow2 .contentLyics').appendChild(fragment);
     }
   }, {
+    key: "setLocalLyric",
+    value: function setLocalLyric() {
+      // 是数组来比较 不是节点 只有在设置高亮的时候才需要用到节点
+      var current = parseInt(this.audio.currentTime * 1000);
+      var nextLineTime = this.lyricArr[this.lyricArrIndex][0];
+
+      if (current > nextLineTime && this.lyricArrIndex < this.lyricArr.length) {
+        var node = this.root.querySelector('[data = "' + this.lyricArr[this.lyricArrIndex][0] + '"]');
+        console.log(node);
+        if (node) this.localLyics(node); //因为数组里面有空字符串
+
+        this.root.querySelector('.lyricsBox .lyricsActive').innerText = this.lyricArr[this.lyricArrIndex][1];
+        this.root.querySelector('.lyricsBox .lyrics').innerText = this.lyricArr[this.lyricArrIndex + 1] ? this.lyricArr[this.lyricArrIndex + 1][1] : '';
+        this.lyricArrIndex++;
+      }
+    }
+  }, {
+    key: "setProgressBar",
+    value: function setProgressBar() {
+      var progress = (this.audio.currentTime / this.audio.duration + 0.05) * 100 + '%';
+      var progressBar = this.root.querySelector('.progressBar');
+      progressBar.style.width = progress;
+      this.root.querySelector('.timeStart').innerText = this.formatTime(this.audio.currentTime);
+    }
+  }, {
     key: "localLyics",
     value: function localLyics(node) {
-      //当前歌词定位
-      console.log(node.offsetTop);
+      //当前歌词高亮
       var offset = node.offsetTop - this.root.querySelector('.mainShow2').offsetHeight / 2;
       offset = offset > 0 ? offset : 0;
       this.root.querySelector('.mainShow2 .contentLyics').style.transform = "translateY(-".concat(offset, "px)");
@@ -456,7 +488,7 @@ var parent = module.bundle.parent;
 if ((!parent || !parent.isParcelRequire) && typeof WebSocket !== 'undefined') {
   var hostname = "" || location.hostname;
   var protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-  var ws = new WebSocket(protocol + '://' + hostname + ':' + "54506" + '/');
+  var ws = new WebSocket(protocol + '://' + hostname + ':' + "55562" + '/');
 
   ws.onmessage = function (event) {
     checkedAssets = {};

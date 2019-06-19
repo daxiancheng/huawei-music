@@ -7,6 +7,7 @@ class player {
         this.currentIndex = 0
         this.audio = new Audio() //相当于在html中创建audio标签
         this.lyricArr = []
+        this.lyricArrIndex = 0
         this.start()
         this.bind()
     }
@@ -52,12 +53,16 @@ class player {
             this.classList.add('active0')
             console.log('left')
         })
-
         swiper.on('swipRight', function () {
             this.classList.remove('active0')
             this.classList.add('active1')
             console.log('right')
         })
+        this.audio.ontimeupdate = function () {
+            console.log(parseInt(self.audio.currentTime * 1000))
+            self.setLocalLyric()
+            self.setProgressBar()
+        }
     }
     preplay() {
         this.currentIndex = (this.currentIndex + this.playList.length - 1) % this.playList.length
@@ -77,11 +82,11 @@ class player {
         this.audio.onloadedmetadata = () => this.root.querySelector('.timeEnd').innerText = this.formatTime(this.audio.duration) //歌词总时长（毫秒）
         this.loadlyric()
     }
-    formatTime(totalTime){
-        let min = parseInt(totalTime/60)
-        min = min>=10 ? '' + min : '0'+min //变成字符串
-        let sec = parseInt(totalTime%60)
-        sec = sec>=10 ? '' + sec : '0'+sec //变成字符串
+    formatTime(totalTime) {
+        let min = parseInt(totalTime / 60)
+        min = min >= 10 ? '' + min : '0' + min //变成字符串
+        let sec = parseInt(totalTime % 60)
+        sec = sec >= 10 ? '' + sec : '0' + sec //变成字符串
         return min + ':' + sec
     }
     loadlyric() { //加载歌词
@@ -89,32 +94,50 @@ class player {
             .then(res => res.json())
             .then(data => this.formatlyrics(data.lrc.lyric))
     }
-    formatlyrics(lyric){
+    formatlyrics(lyric) {
         let fragment = document.createDocumentFragment()
         lyric.split(/\n/)
-        .filter((str)=>str.match(/\[.+?\]/))
-        .forEach(line=>{
-            let str = line.replace(/\[.+?\]/g,'')
-            line.match(/\[.+?\]/g)
-            .forEach(t=>{
-                t = t.replace(/^\[|\]?/,'')
-                let milliseconds = parseInt(t.slice(0,2))*60*1000 + parseInt(t.slice(3,5))*1000+ parseInt(t.slice(6))
-                this.lyricArr.push([milliseconds,str])
+            .filter((str) => str.match(/\[.+?\]/))
+            .forEach(line => {
+                let str = line.replace(/\[.+?\]/g, '')
+                line.match(/\[.+?\]/g)
+                    .forEach(t => {
+                        t = t.replace(/^\[|\]?/, '')
+                        let milliseconds = parseInt(t.slice(0, 2)) * 60 * 1000 + parseInt(t.slice(3, 5)) * 1000 + parseInt(t.slice(6))
+                        this.lyricArr.push([milliseconds, str])
+                    })
             })
-        })
-        this.lyricArr.filter(line=>line[1].trim() !=='').sort((v1,v2)=>v1[0]-v2[0])
-        .forEach(line=>{
-            let p = document.createElement('p')
-            p.innerText = line[1]
-            p.setAttribute('data',line[0])
-            fragment.appendChild(p)
-        })
+        this.lyricArr.filter(line => line[1].trim() !== '').sort((v1, v2) => v1[0] - v2[0])
+            .forEach(line => {
+                let p = document.createElement('p')
+                p.innerText = line[1]
+                p.setAttribute('data', line[0])
+                fragment.appendChild(p)
+            })
+        console.log(this.lyricArr)
         this.root.querySelector('.mainShow2 .contentLyics').innerHTML = ''
         this.root.querySelector('.mainShow2 .contentLyics').appendChild(fragment)
     }
-    localLyics(node) { //当前歌词定位
-        console.log(node.offsetTop)
-        let offset = node.offsetTop - this.root.querySelector('.mainShow2').offsetHeight/2
+    setLocalLyric() { // 是数组来比较 不是节点 只有在设置高亮的时候才需要用到节点
+        let current = parseInt(this.audio.currentTime*1000)
+        let nextLineTime = this.lyricArr[this.lyricArrIndex][0]
+        if(current>nextLineTime && this.lyricArrIndex<this.lyricArr.length){
+            let node = this.root.querySelector('[data = "' + this.lyricArr[this.lyricArrIndex][0] + '"]')
+            console.log(node)
+            if(node) this.localLyics(node) //因为数组里面有空字符串
+            this.root.querySelector('.lyricsBox .lyricsActive').innerText = this.lyricArr[this.lyricArrIndex][1]
+            this.root.querySelector('.lyricsBox .lyrics').innerText = this.lyricArr[this.lyricArrIndex + 1] ? this.lyricArr[this.lyricArrIndex + 1][1] : ''
+            this.lyricArrIndex++
+        }
+    }
+    setProgressBar(){
+        let progress = (this.audio.currentTime / this.audio.duration + 0.05)*100 + '%'
+        let progressBar = this.root.querySelector('.progressBar')
+        progressBar.style.width = progress
+        this.root.querySelector('.timeStart').innerText = this.formatTime(this.audio.currentTime)
+    }
+    localLyics(node) { //当前歌词高亮
+        let offset = node.offsetTop - this.root.querySelector('.mainShow2').offsetHeight / 2
         offset = offset > 0 ? offset : 0
         this.root.querySelector('.mainShow2 .contentLyics').style.transform = `translateY(-${offset}px)`
         this.root.querySelectorAll('.mainShow2 .contentLyics p').forEach(element => {
